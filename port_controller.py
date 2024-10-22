@@ -25,6 +25,7 @@ class PortController:
         self.create_canvas()
         self.create_output_field()
         self.create_input_field()
+        #self.add_text_in_output_field("Found COM ports:")
         self.find_ports()
         self.create_menu()
         self.create_buttons()
@@ -93,6 +94,9 @@ class PortController:
         menu.post(event.x_root, event.y_root)
 
     def open_settings(self):
+        self.ports = serial.tools.list_ports.comports()
+        for port in self.ports:
+            desc = port.description
         settings_window = SettingsWindow(self.root, self.ports, self.update_port_settings, default_port=self.select_port, default_baudrate=self.baudrate)
 
     def open_port(self):
@@ -168,10 +172,11 @@ class PortController:
             self.add_text_in_output_field(">>>ERROR>>>COM port is closed")
             return
         data = self.input_field.get(1.0, "end-1c")
+        data += "\r\n"
         if not data:
             self.add_text_in_output_field(">>>ERROR>>>Empty input field")
             return
         if self.ser.is_open:
             self.ser.write(data.encode("utf-8"))
-            self.add_text_in_output_field(">>>"+self.select_port+" Sent>>>"+data)
+            self.add_text_in_output_field(">>>"+self.select_port+">>>"+data)
         
